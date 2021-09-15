@@ -177,17 +177,30 @@ void functionalFit()
     cout << "Functional Fit: " << sqrt(diffParabola / (numIndices - 2)) << endl;
 }
 
+float calculateFivePointDifferential(int time)
+{
+    return (- values[time + 2].second + 8 * values[time+1].second - 8 * values[time-1].second + values[time-2].second) / 
+        (12 * (indices[1] - indices[0])); //Change the intervale calculation
+}
+
 void fivePointStencil()
 {
-
+    float diffStencil = 0.0f;
+    for(int i = 2; i < numIndices - 2; i++)
+    {
+        float diff = calculateFivePointDifferential(i);
+        diffStencil = abs(diff * diff - calculateF2(indices[i]) * calculateF2(indices[i]));
+    }
+    cout << "Five Point Stencil: " << sqrt(diffStencil / (numIndices - 2)) << endl;
 }
 
 int main()
 {
-    computePoints(-10.0f, 10.0f, 100);
+    computePoints(-10.0f, 10.0f, 50);
     calculateValuesForArray(false);
     simpleSlope();
     threePointDerivative();
     functionalFit();
+    fivePointStencil();
     return (0);
 }
