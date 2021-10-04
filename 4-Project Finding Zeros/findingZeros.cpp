@@ -74,8 +74,25 @@ double bisection(double leftEndpoint, double rightEndpoint, double tolerance, in
         
     }
 
-    return nan("");
+    return nan("Max Iterations Exceeded");
 
+}
+
+double fivePointStencil(double (*func) (double), double mid, double stepSize)
+{
+    return (-1 * func(mid + 2 * stepSize) + 8 * func(mid + stepSize) - 8 * func(mid - stepSize) + func(mid - 2 * stepSize))/(12 * stepSize);
+}
+
+double newtonRaphson(double (*func) (double), double initial, double stepSize, int maxIterations, double tolerance)
+{
+    double cur = initial;
+    for(int i = 0; i < maxIterations; i++)
+    {
+        cur = cur - func(cur) / fivePointStencil(func, cur, stepSize);
+        if(abs(func(cur)) < tolerance)
+            return cur;
+    }
+    return nan("maxIterations Exceeded");
 }
 
 
@@ -87,6 +104,9 @@ int main()
 
     for(int i = 0; i < sizeof(ar) / sizeof (ar[0]); i++)
     {
-        cout << "BISEcTION " << ar[i] << " " << bisection(-10, 10, 0.00001, 10000, ar[i]) << endl;
+        double bi = bisection(-10, 10, 0.00001, 10000, ar[i]);
+        double newt = newtonRaphson(ar[i], 1, 0.001, 1000000, 0.000001);
+        cout << "BISEcTION " << i << " " << bi << " Calculated bi: " << ar[i](bi) << endl;
+        cout << "Newton " << newt << " Calculated Newton: " << ar[i](newt) << endl;
     }
 }
