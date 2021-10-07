@@ -176,14 +176,16 @@ double fivePointStencil(double (*func) (double), double mid, double stepSize)
 }
 
 /**
- * @brief the newton rpahs
+ * @brief the newton rpahson method works by implementing x1 = x0 + f(x0) / f'(x0) and multiple iterations
+ * the derivative of the function is found through the use of the method fivePointStencil, which employs the five point stencil in 
+ * finding a derivative.
  * 
- * @param func 
- * @param initial 
- * @param stepSize 
- * @param maxIterations 
- * @param tolerance 
- * @return double 
+ * @param func the function the newtonRaphson will evaluate
+ * @param initial the initial starting parameter
+ * @param stepSize the step size in which the five point stencil will use
+ * @param maxIterations the max iterations that will be used in the method, exceeding will result in a nan
+ * @param tolerance the tolerance to 0 that is needed
+ * @return double the location of x where the func hits 0, nan otherwise if max iteration or the 0 doesn't exist
  */
 double newtonRaphson(double (*func) (double), double initial, double stepSize, int maxIterations, double tolerance)
 {
@@ -199,7 +201,12 @@ double newtonRaphson(double (*func) (double), double initial, double stepSize, i
     return nan("maxIterations Exceeded");
 }
 
-
+/**
+ * @brief Runs 9 functions to through the testing of the bisection and newtonRaphson. 
+ * The bisections tests from a range from -10 to 10 while newton raphson starts at 1.
+ * 
+ * @return int 0
+ */
 int main()
 {
     fn ar[] = {
@@ -214,4 +221,6 @@ int main()
         cout << "BISEcTION " << i << " " << bi << " Calculated bi: " << ar[i](bi) << endl;
         cout << "Newton " << newt << " Calculated Newton: " << ar[i](newt) << endl;
     }
+
+    return (0);
 }
