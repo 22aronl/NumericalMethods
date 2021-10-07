@@ -18,6 +18,7 @@
 #include <math.h>
 #include <tuple>
 
+// Defines fn as a function that takes a double as parameter and returns a double from a functions
 typedef double (*fn) (double a);
 
 using namespace std;
