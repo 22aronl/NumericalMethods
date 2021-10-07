@@ -130,7 +130,7 @@ double func9(double x)
  * @param tolerance wher ethe method will end (how close does the output need to be to 0)
  * @param maxInterations how many times the method will run before giving up
  * @param func the function (which returns a double) that is to be calcualated
- * @return double the x-position
+ * @return double the x-position; otherwise, if both endpoints y don't have opposite signs, nan will be returned
  */
 double bisection(double leftEndpoint, double rightEndpoint, double tolerance, int maxInterations, double (*func) (double))
 {
@@ -155,7 +155,7 @@ double bisection(double leftEndpoint, double rightEndpoint, double tolerance, in
         else
             throw invalid_argument("Infinite Loop");
         
-    }
+    } //for(int i = 0; i < maxInterations; i++)
 
     return nan("Max Iterations Exceeded");
 
@@ -197,7 +197,7 @@ double newtonRaphson(double (*func) (double), double initial, double stepSize, i
             return cur;
 
         // cout << "STEP " << cur << " " << func(cur) << endl;
-    }
+    } //for(int i = 0; i < maxIterations; i++)
     return nan("maxIterations Exceeded");
 }
 
@@ -220,7 +220,7 @@ int main()
         double newt = newtonRaphson(ar[i], 1, 0.01, 1000000, 0.000001);
         cout << "BISEcTION " << i << " " << bi << " Calculated bi: " << ar[i](bi) << endl;
         cout << "Newton " << newt << " Calculated Newton: " << ar[i](newt) << endl;
-    }
+    } //for(int i = 0; i < sizeof(ar) / sizeof (ar[0]); i++)
 
     return (0);
 }
