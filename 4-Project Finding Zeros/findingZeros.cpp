@@ -119,7 +119,7 @@ double func8(double a)
  */
 double func9(double x)
 {
-    return x * x * x + 1;
+    return x * x * x ;
 }
 
 /**
@@ -193,11 +193,17 @@ double newtonRaphson(double (*func) (double), double initial, double stepSize, i
     double cur = initial;
     for(int i = 0; i < maxIterations; i++)
     {
-        cur = cur - func(cur) / fivePointStencil(func, cur, stepSize);
+        double deriv = fivePointStencil(func, cur, stepSize);
+        if(deriv == 0)
+        {
+            cout << "STATIONARY POINT" << endl;
+            return nan("");
+        }
+        cur = cur - func(cur) / deriv;
         if(abs(func(cur)) < tolerance)
             return cur;
 
-        // cout << "STEP " << cur << " " << func(cur) << endl;
+        //cout << "STEP " << cur << " " << func(cur) << endl;
     } //for(int i = 0; i < maxIterations; i++)
     return nan("maxIterations Exceeded");
 }
@@ -218,7 +224,7 @@ int main()
     for(int i = 0; i < sizeof(ar) / sizeof (ar[0]); i++)
     {
         double bi = bisection(-10, 10, 0.00001, 10000, ar[i]);
-        double newt = newtonRaphson(ar[i], 1, 0.01, 1000000, 0.000001);
+        double newt = newtonRaphson(ar[i],2, 0.001, 1000000, 0.00001);
         cout << "BISEcTION " << i << " " << bi << " Calculated bi: " << ar[i](bi) << endl;
         cout << "Newton " << newt << " Calculated Newton: " << ar[i](newt) << endl;
     } //for(int i = 0; i < sizeof(ar) / sizeof (ar[0]); i++)
