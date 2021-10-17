@@ -176,6 +176,11 @@ double fivePointStencil(double (*func) (double), double mid, double stepSize)
     return (-1 * func(mid + 2 * stepSize) + 8 * func(mid + stepSize) - 8 * func(mid - stepSize) + func(mid - 2 * stepSize))/(12 * stepSize);
 }
 
+double doubleFivePointStencil(double (*func) (double), double mid, double stepSize)
+{
+    return (-1 * fivePointStencil(func, mid + 2 * stepSize, stepSize) + 8 * fivePointStencil(func, mid + stepSize, stepSize) - 8 * fivePointStencil(func, mid - stepSize, stepSize) + fivePointStencil(func, mid - 2 * stepSize, stepSize))/(12 * stepSize);
+}
+
 /**
  * @brief the newton rpahson method works by implementing x1 = x0 + f(x0) / f'(x0) and multiple iterations
  * the derivative of the function is found through the use of the method fivePointStencil, which employs the five point stencil in 
@@ -208,6 +213,28 @@ double newtonRaphson(double (*func) (double), double initial, double stepSize, i
     return nan("maxIterations Exceeded");
 }
 
+double doubleNewtonRaphson(double (*func) (double), double initial, double stepSize, int maxIterations, double tolerance)
+{
+    double cur = initial;
+    for(int i = 0; i < maxIterations; i++)
+    {
+        double deriv = doubleFivePointStencil(func, cur, stepSize);
+        if(deriv == 0)
+        {
+            cout << "STATIONARY POINT" << endl;
+            return nan("");
+        }
+        cur = cur - fivePointStencil(func, cur, stepSize) / deriv;
+        if(abs(fivePointStencil(func, cur, stepSize)) < tolerance)
+            return cur;
+
+        //cout << "STEP " << cur << " " << func(cur) << endl;
+    } //for(int i = 0; i < maxIterations; i++)
+    return nan("maxIterations Exceeded");
+}
+
+
+
 /**
  * @brief Runs 9 functions to through the testing of the bisection and newtonRaphson. 
  * The bisections tests from a range from -10 to 10 while newton raphson starts at 1.
@@ -224,9 +251,15 @@ int main()
     for(int i = 0; i < sizeof(ar) / sizeof (ar[0]); i++)
     {
         double bi = bisection(-10, 10, 0.00001, 10000, ar[i]);
-        double newt = newtonRaphson(ar[i],2, 0.001, 1000000, 0.00001);
-        cout << "BISEcTION " << i << " " << bi << " Calculated bi: " << ar[i](bi) << endl;
-        cout << "Newton " << newt << " Calculated Newton: " << ar[i](newt) << endl;
+        double newt = newtonRaphson(ar[i],0.2, 0.001, 1000000, 0.00001);
+        double localMin = doubleNewtonRaphson(ar[i],0.2, 0.001, 1000000, 0.00001);
+        cout << "Funciton " << (i + 1) << endl;
+        cout << "Bisection: " << bi << "   Newton: " << newt << "    Local Min: " << localMin << endl;
+        cout << "Calcuations f" << (i + 1) << "(x)->  B: " << ar[i](bi) << "  N: " << ar[i](newt) << "  L: " << ar[i](localMin) << endl;
+        // cout << "BISEcTION " << bi << "      Calculated bi: " << ar[i](bi) << endl;
+        // cout << "Newton " << newt << "      Calculated Newton: " << ar[i](newt) << endl;
+        // cout << "Local Min: " << localMin << "      Calculated Min: " << ar[i](localMin) << endl;
+        cout << endl;
     } //for(int i = 0; i < sizeof(ar) / sizeof (ar[0]); i++)
 
     return (0);
