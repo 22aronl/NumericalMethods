@@ -176,6 +176,14 @@ double fivePointStencil(double (*func) (double), double mid, double stepSize)
     return (-1 * func(mid + 2 * stepSize) + 8 * func(mid + stepSize) - 8 * func(mid - stepSize) + func(mid - 2 * stepSize))/(12 * stepSize);
 }
 
+/**
+ * @brief Calculates the double derivative of the given function using the five point stencil method twice.
+ * 
+ * @param func the function where the double derivative will be calcualted on
+ * @param mid the point at which wher ethe derivative will be calcualted on
+ * @param stepSize  how far the funciton will step in either direction for each step
+ * @return double the approximation of the double derivative of the given funciton at mid
+ */
 double doubleFivePointStencil(double (*func) (double), double mid, double stepSize)
 {
     return (-1 * fivePointStencil(func, mid + 2 * stepSize, stepSize) + 8 * fivePointStencil(func, mid + stepSize, stepSize) - 8 * fivePointStencil(func, mid - stepSize, stepSize) + fivePointStencil(func, mid - 2 * stepSize, stepSize))/(12 * stepSize);
@@ -213,6 +221,17 @@ double newtonRaphson(double (*func) (double), double initial, double stepSize, i
     return nan("maxIterations Exceeded");
 }
 
+/**
+ * @brief this finds the local minimum of a function by using the 
+ * newtonraphson method and through the use of the double five point stencil
+ * 
+ * @param func the funciton in which the local min will be found
+ * @param initial the starting testing point
+ * @param stepSize how large the steps forthe rive poitn stecil method will be used
+ * @param maxIterations the max number of iterations in the newton raphson
+ * @param tolerance how close the number has to get to the local min
+ * @return double the x coord of the local min or nan
+ */
 double doubleNewtonRaphson(double (*func) (double), double initial, double stepSize, int maxIterations, double tolerance)
 {
     double cur = initial;
@@ -226,7 +245,15 @@ double doubleNewtonRaphson(double (*func) (double), double initial, double stepS
         }
         cur = cur - fivePointStencil(func, cur, stepSize) / deriv;
         if(abs(fivePointStencil(func, cur, stepSize)) < tolerance)
-            return cur;
+        {
+            if(doubleFivePointStencil(func, cur, stepSize) > 0)
+            {
+                cout << "LOCAL MAX FOUND" << endl;
+                return nan("local max");
+            }
+            else
+                return cur;
+        }
 
         //cout << "STEP " << cur << " " << func(cur) << endl;
     } //for(int i = 0; i < maxIterations; i++)
@@ -250,12 +277,12 @@ int main()
 
     for(int i = 0; i < sizeof(ar) / sizeof (ar[0]); i++)
     {
-        double bi = bisection(-10, 10, 0.00001, 10000, ar[i]);
-        double newt = newtonRaphson(ar[i],0.2, 0.001, 1000000, 0.00001);
-        double localMin = doubleNewtonRaphson(ar[i],0.2, 0.001, 1000000, 0.00001);
-        cout << "Funciton " << (i + 1) << endl;
+        double bi = bisection(-10, 10, 0.000001, 100000, ar[i]);
+        double newt = newtonRaphson(ar[i],0.2, 0.001, 1000000, 0.000001);
+        double localMin = doubleNewtonRaphson(ar[i],0.2, 0.001, 1000000, 0.000001);
+        cout << "Function " << (i + 1) << ":" << endl;
         cout << "Bisection: " << bi << "   Newton: " << newt << "    Local Min: " << localMin << endl;
-        cout << "Calcuations f" << (i + 1) << "(x)->  B: " << ar[i](bi) << "  N: " << ar[i](newt) << "  L: " << ar[i](localMin) << endl;
+        cout << "Calcuations f" << (i + 1) << "(x)->  B: " << ar[i](bi) << "  N: " << ar[i](newt) << "  L: " << ar[i](localMin) << " Deriv: " << fivePointStencil(ar[i], localMin, 0.001) << endl;
         // cout << "BISEcTION " << bi << "      Calculated bi: " << ar[i](bi) << endl;
         // cout << "Newton " << newt << "      Calculated Newton: " << ar[i](newt) << endl;
         // cout << "Local Min: " << localMin << "      Calculated Min: " << ar[i](localMin) << endl;
