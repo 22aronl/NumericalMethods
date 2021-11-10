@@ -232,7 +232,7 @@ double newtonRaphson(double (*func) (double), double initial, double stepSize, i
  * @param tolerance how close the number has to get to the local min
  * @return double the x coord of the local min or nan
  */
-double doubleNewtonRaphson(double (*func) (double), double initial, double stepSize, int maxIterations, double tolerance)
+double doubleNewtonRaphson(double (*func) (double), double initial, double stepSize, int maxIterations, double tolerance, double maxBounds)
 {
     double cur = initial;
     for(int i = 0; i < maxIterations; i++)
@@ -241,15 +241,20 @@ double doubleNewtonRaphson(double (*func) (double), double initial, double stepS
         if(deriv == 0)
         {
             cout << "STATIONARY POINT" << endl;
-            return nan("");
+            return cur;
         }
         cur = cur - fivePointStencil(func, cur, stepSize) / deriv;
+        if(abs(cur) > maxBounds)
+        {
+            cout << "Bounds Exceeded" << endl;
+            return nan("BoundsExceeded");
+        }
         if(abs(fivePointStencil(func, cur, stepSize)) < tolerance)
         {
-            if(doubleFivePointStencil(func, cur, stepSize) > 0)
+            if(doubleFivePointStencil(func, cur, stepSize) < 0)
             {
                 cout << "LOCAL MAX FOUND" << endl;
-                return nan("local max");
+                return cur;
             }
             else
                 return cur;
@@ -275,11 +280,12 @@ int main()
     }; 
     //fn ar[] = {func9};
 
+
     for(int i = 0; i < sizeof(ar) / sizeof (ar[0]); i++)
     {
         double bi = bisection(-10, 10, 0.000001, 100000, ar[i]);
         double newt = newtonRaphson(ar[i],0.2, 0.001, 1000000, 0.000001);
-        double localMin = doubleNewtonRaphson(ar[i],0.2, 0.001, 1000000, 0.000001);
+        double localMin = doubleNewtonRaphson(ar[i],-0.2, 0.001, 1e6, 1e-5, 1e9);
         cout << "Function " << (i + 1) << ":" << endl;
         cout << "Bisection: " << bi << "   Newton: " << newt << "    Local Min: " << localMin << endl;
         cout << "Calcuations f" << (i + 1) << "(x)->  B: " << ar[i](bi) << "  N: " << ar[i](newt) << "  L: " << ar[i](localMin) << " Deriv: " << fivePointStencil(ar[i], localMin, 0.001) << endl;
@@ -288,6 +294,7 @@ int main()
         // cout << "Local Min: " << localMin << "      Calculated Min: " << ar[i](localMin) << endl;
         cout << endl;
     } //for(int i = 0; i < sizeof(ar) / sizeof (ar[0]); i++)
+
 
     return (0);
 }
