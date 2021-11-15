@@ -77,14 +77,17 @@ void readFile(string fileName)
         yV.push_back(b);
         i++;
     }
-    cout << i << endl;
     size = i;
 
-    x = xV.data();
-    y = yV.data();
+    x = new double[size];
+    y = new double[size];
 
-    for(i = 0; i < size; i++)
-        cout << "i " << i << " " << x[i] << " " << y[i] << endl;
+    for(int i = 0; i < size;i ++)
+    {
+        x[i] = xV[i];
+        y[i] = yV[i];
+    }
+
     file.close();
 }
 
@@ -249,35 +252,43 @@ double* train(double* a, fn func, double threshold, double learningFactor, int m
 int main(int argc, char* argv[])
 {
     string basepath = "./5-Least Squares/";
-    string defaultFile = "input.txt";
+    string defaultFile = "UCrBHe1.txt";
     string outputFile = "output.txt";
 
-    string fileName = basepath;
-    if (argc > 1)
-        fileName += argv[1];
-    else
-        fileName += defaultFile;
+    string fileName = basepath + defaultFile;
+    // if (argc > 1)
+    //     fileName += argv[1];
+    // else
+    //     fileName += defaultFile;
+    
+    int curFunc = 1;
 
-    if (argc > 2)
-        outputFile = argv[2];
+    // if(argc > 2)
+    //     curFunc = atoi(argv[2]);
+
+    // if (argc > 3)
+    //     outputFile = argv[3];
+
+    // cout << "ARGUMENTS" << argc << endl;
 
     readFile(fileName);
-    
 
-    cout << "X " << x[0] << " " << x[41] << endl;
+
     fn funcAr[] = {func1, func2};
     double a[] = {1, 10, 2, 3};
-    double threshold = 1e-1;
-    double learningFactor = 1e-11;
+    double threshold = 1e-5;
+    double learningFactor = 1e-6;
     double stepSize = 1e-6;
     double momentum = 0.9;
     int maxIterations = 1e8;
-    int curFunc = 0;
+    
+    
 
     arguments = sizeof(a) / sizeof(a[0]);
 
     cout << "Starting Training -> Learning Factor: " << learningFactor << ", Max Iterations: " << maxIterations << endl;
     cout << "Beginining Error " << calculateError(a, funcAr[curFunc]) << endl << endl;
+
 
     double* a1 = train(a, funcAr[curFunc], threshold, learningFactor, maxIterations, stepSize, momentum);
  
