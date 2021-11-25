@@ -252,7 +252,7 @@ double* train(double* a, fn func, double threshold, double learningFactor, int m
 int main(int argc, char* argv[])
 {
     string basepath = "./5-Least Squares/";
-    string defaultFile = "UCrBHe1.txt";
+    string defaultFile = "input.txt";
     string outputFile = "output.txt";
 
     string fileName = basepath + defaultFile;
@@ -261,7 +261,7 @@ int main(int argc, char* argv[])
     // else
     //     fileName += defaultFile;
     
-    int curFunc = 1;
+    int curFunc = 0;
 
     // if(argc > 2)
     //     curFunc = atoi(argv[2]);
@@ -277,7 +277,7 @@ int main(int argc, char* argv[])
     fn funcAr[] = {func1, func2};
     double a[] = {1, 10, 2, 3};
     double threshold = 1e-5;
-    double learningFactor = 1e-6;
+    double learningFactor = 1e-11;
     double stepSize = 1e-6;
     double momentum = 0.9;
     int maxIterations = 1e8;
