@@ -19,6 +19,7 @@ typedef double (*fn) (double x);
 double* xAr;
 double** yAr;
 double** yArSimpson;
+int* histogram;
 
 using namespace std;
 
@@ -189,30 +190,72 @@ double calculateRMS(double* xAr, double** yAr, int func, fn funcToIntegrate, int
 }
 
 /**
+ * @brief charaterizes the histogram of the data
+ * 
+ * @param size the size of the data, number of bins
+ * @param low the low bound of data
+ * @param high the high bound of data
+ * @param input single input data
+ */
+void characterizeIntoHistorgram(int size, double input, int low, int high)
+{
+    double dif = (double)(high - low) / size;
+    histogram[(int) ((input - low) / dif)]++;
+}
+
+/**
  * @brief calcualtes hte area of a dimension sphere of radius 1
  * 
  * @param length the radius of circle
  * @param iterations the number to tries 
+ * @param bins the number of bins
  * @param dimension the dimensions of the sphere (number of diemsions)
  * @return double the area of the sphere
  */
-double monteCarloArea(double length, int iterations, int dimension)
-{
-    double inCircle = 0;
-    double temp, total;
-    for(int i = 0; i < iterations; i++) {
-        total = 0;
-        for(int j = 0; j < dimension; j++) {
-            temp = (double)rand() / RAND_MAX * (length * 2) - length;
-            total += temp * temp;
-        }
-
-        if(total <= length * length)
-            inCircle++;
+double monteCarloArea(double length, int iterations, int bins, int dimension, string fileN)
+{   
+    ofstream file;
+    file.open(fileN + ".txt");
+    if (!file.is_open()) {
+        cout << "File "  << " not found" << endl;
     }
 
+    ofstream file2;
+    file2.open(fileN + "2.txt");
+    if (!file2.is_open()) {
+        cout << "File "  << " not found" << endl;
+    }
+    double inCircle = 0;
+    double temp, total;
+    int ints = 1000;
+    for(int j = 0; j < iterations/ints; j++)
+    {
+
+        for(int i = 0; i < ints; i++) {
+            total = 0;
+            for(int j = 0; j < dimension; j++) {
+                temp = (double)rand() / RAND_MAX * (length * 2) - length;
+                //characterizeIntoHistorgram(bins, temp + length, 0, 2 * length);
+                
+                total += temp * temp;
+            }
+
+            if(total < length * length) {
+                inCircle++;
+            }
+
+
+            
+        }
+        file << j * ints << "\t" << (inCircle/j/ints) << endl;
+        file2 << log(j * ints) << "\t" << log(abs(3.14159265359/6 - (inCircle/j/ints))) << endl;
+    }
+    file.close();
+    file2.close();
     return inCircle / iterations;
 }
+
+
 
 /**
  * @brief this runs all the code for the project
@@ -221,6 +264,7 @@ double monteCarloArea(double length, int iterations, int dimension)
  */
 int main() 
 {
+    srand(time(NULL));
     double lowerBound = -2.0;
     double higherBound = 2.0;
     int iterations = 100;
@@ -231,7 +275,7 @@ int main()
     xAr = new double[iterations2];
     yAr = new double*[4];
     yArSimpson = new double*[4];
-
+    histogram = new int[iterations2];
     for(int i = 0; i < 4; i++)
     {
         yAr[i] = new double[iterations2];
@@ -245,7 +289,7 @@ int main()
         for(int j = 0; j < iterations2; j++) {
             xAr[j] = lowerBound + j * (higherBound - lowerBound) / iterations2;
             yAr[i][j] = trapezoidalRule(lowerBound, xAr[j], iterations, funcAr[i]);
-            yAr[i][j] = simpsonRule(lowerBound, xAr[j], iterations, funcAr[i]);
+            yArSimpson[i][j] = simpsonRule(lowerBound, xAr[j], iterations, funcAr[i]);
         }
     }
 
@@ -263,12 +307,41 @@ int main()
         cout << "SIMP: Function " << i << ": " << calculateRMS(xAr, yArSimpson, i, funcIntegrateAr[i], iterations2) << endl;
     }
 
+    for(int i = 0; i < 4; i++) {
+        cout << "\%Difference: " << i << ": " << abs(simpsonRule(lowerBound, higherBound, iterations, funcAr[i]) - (funcIntegrateAr[i](higherBound)
+            - funcIntegrateAr[i](lowerBound))/(funcIntegrateAr[i](higherBound) - funcIntegrateAr[i](lowerBound)) * 100) << endl;
+    }
 
-    cout << "Monte Carlo: " << monteCarloArea(2, 10000000, 2) << endl;
+    
+    //cout << "Monte Carlo: " << monteCarloArea(1, 10000000, iterations, 2, "./6-Integration/monteCarlo.txt") << endl;
     cout << "PI / 4: " << M_PI / 4 << endl;
-    cout << "Monte Carlo: " << monteCarloArea(2, 10000000, 3) << endl;
+
+    cout << "Monte Carlo: " << monteCarloArea(1, 1000000, iterations, 3, "./6-Integration/monteCarlo") << endl;
     cout << "PI / 6: " << M_PI / 6 << endl;
+
+
+    // int iterations3 = 1000;
+    // int xArMonte[iterations3];
+    // double yArMonte[iterations3];
+    // int dist = 100;
+    // for(int i = 0; i < iterations3; i++) {
+    //     xArMonte[i] = i * dist;
+    //     yArMonte[i] = monteCarloArea(dist, xArMonte[i], iterations, 3);
+    // }
 
     outputToFile("./6-Integration/outputTrap", xAr, yAr, 4, iterations2);
     outputToFile("./6-Integration/outputSimp", xAr, yArSimpson, 4, iterations2);
+
+    ofstream file;    
+    file.open("./6-Integration/hist.txt");
+    if (!file.is_open()) {
+        cout << "File "  << " not found" << endl;
+    }
+
+    for(int i = 0; i < iterations; i++) {
+        file << i << "\t" << histogram[i] << endl;
+    }
+    file.close();
+
+    
 }
