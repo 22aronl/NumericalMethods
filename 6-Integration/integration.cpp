@@ -298,8 +298,8 @@ int main()
     }
 
     for(int i = 0; i < 4; i++) {
-        cout << "\%Difference: " << i << ": " << abs(trapezoidalRule(lowerBound, higherBound, iterations, funcAr[i]) - (funcIntegrateAr[i](higherBound)
-            - funcIntegrateAr[i](lowerBound))/(funcIntegrateAr[i](higherBound) - funcIntegrateAr[i](lowerBound)) * 100) << endl;
+        cout << "\%Difference: " << i << ": " << abs((trapezoidalRule(lowerBound, higherBound, iterations, funcAr[i]) - (funcIntegrateAr[i](higherBound)
+            - funcIntegrateAr[i](lowerBound)))/(funcIntegrateAr[i](higherBound) - funcIntegrateAr[i](lowerBound)) * 100) << endl;
     }
 
 
@@ -308,8 +308,8 @@ int main()
     }
 
     for(int i = 0; i < 4; i++) {
-        cout << "\%Difference: " << i << ": " << abs(simpsonRule(lowerBound, higherBound, iterations, funcAr[i]) - (funcIntegrateAr[i](higherBound)
-            - funcIntegrateAr[i](lowerBound))/(funcIntegrateAr[i](higherBound) - funcIntegrateAr[i](lowerBound)) * 100) << endl;
+        cout << "\%Difference: " << i << ": " << abs((simpsonRule(lowerBound, higherBound, iterations, funcAr[i]) - (funcIntegrateAr[i](higherBound)
+            - funcIntegrateAr[i](lowerBound)))/(funcIntegrateAr[i](higherBound) - funcIntegrateAr[i](lowerBound)) * 100) << endl;
     }
 
     
